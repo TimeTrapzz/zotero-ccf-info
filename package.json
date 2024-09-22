@@ -1,23 +1,23 @@
 {
-  "name": "zotero-plugin-template",
-  "version": "2.0.2-beta.3",
-  "description": "Zotero Plugin Template",
+  "name": "zotero-ccf-info",
+  "version": "0.0.1",
+  "description": "Zotero CCF Info",
   "config": {
-    "addonName": "Zotero Plugin Template",
-    "addonID": "addontemplate@euclpts.com",
-    "addonRef": "addontemplate",
-    "addonInstance": "AddonTemplate",
-    "prefsPrefix": "extensions.zotero.addontemplate"
+    "addonName": "Zotero CCF Info",
+    "addonID": "ccfinfo@timetrapzz.site",
+    "addonRef": "ccfinfo",
+    "addonInstance": "CCFInfo",
+    "prefsPrefix": "extensions.zotero.ccfinfo"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/windingwind/zotero-plugin-template.git"
+    "url": "git+https://github.com/TimeTrapzz/zotero-ccf-info.git"
   },
-  "author": "windingwind",
+  "author": "TimeTrapzz",
   "bugs": {
-    "url": "https://github.com/windingwind/zotero-plugin-template/issues"
+    "url": "https://github.com/TimeTrapzz/zotero-ccf-info/issues"
   },
-  "homepage": "https://github.com/windingwind/zotero-plugin-template#readme",
+  "homepage": "https://github.com/TimeTrapzz/zotero-ccf-info#readme",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "zotero-plugin serve",

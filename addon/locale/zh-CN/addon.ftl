@@ -9,3 +9,4 @@ prefs-table-title = 标题
 prefs-table-detail = 详情
 tabpanel-lib-tab-label = 库标签
 tabpanel-reader-tab-label = 阅读器标签
+get-ccf-rank = 获取CCF排名
