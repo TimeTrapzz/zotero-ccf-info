@@ -1,6 +1,6 @@
 {
   "name": "zotero-ccf-info",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Zotero CCF Info",
   "config": {
     "addonName": "Zotero CCF Info",
