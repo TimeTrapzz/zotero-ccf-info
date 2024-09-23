@@ -61,13 +61,13 @@ export class UIExampleFactory {
               ztoolkit.log(ccfInfo);
               ztoolkit.log(citationNumber);
 
-              new ztoolkit.ProgressWindow(config.addonName)
-                .createLine({
-                  text: `已更新"${entry.getField("title")}"的ccf信息`,
-                  type: "success",
-                  progress: 100,
-                })
-                .show();
+              // new ztoolkit.ProgressWindow(config.addonName)
+              //   .createLine({
+              //     text: `已更新"${entry.getField("title")}"的ccf信息`,
+              //     type: "success",
+              //     progress: 100,
+              //   })
+              //   .show();
             } catch (error: unknown) {
               console.error(`获取ccf信息时出错：${(error as Error).message}`);
               new ztoolkit.ProgressWindow(config.addonName)
