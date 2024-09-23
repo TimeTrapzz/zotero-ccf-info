@@ -1,7 +1,7 @@
 {
   "name": "zotero-ccf-info",
   "version": "0.1.1",
-  "description": "Zotero CCF Info",
+  "description": "Zotero Plugin for easily obtaining the ccf rating of a paper, the corresponding conference/journal and the number of citations",
   "config": {
     "addonName": "Zotero CCF Info",
     "addonID": "ccfinfo@timetrapzz.site",
