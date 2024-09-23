@@ -4580,7 +4580,7 @@ export const PaperInfo: PaperInfo = {
     xhr.addEventListener("readystatechange", function (this: XMLHttpRequest) {
       if (this.readyState === this.DONE) {
         if (this.status !== 200) {
-          update_func(item, { callNumber: `Error: ${this.status}` });
+          update_func(item, { ccfInfo: `Error: ${this.status}` });
           return;
         }
         const responseData = JSON.parse(this.responseText).data;
@@ -4596,12 +4596,12 @@ export const PaperInfo: PaperInfo = {
           }
         }
         if (hit_index === -1) {
-          update_func(item, { callNumber: "Not Found" });
+          update_func(item, { ccfInfo: "Not Found" });
         } else {
           const pcitations = responseData.hitList[hit_index].ncitation;
           const addition_info = min_dis > 0 ? `?ED:${min_dis}` : "";
 
-          update_func(item, { extra: pcitations });
+          update_func(item, { citationNumber: pcitations });
         }
       }
     });
@@ -4647,12 +4647,12 @@ export const PaperInfo: PaperInfo = {
       console.log("dblp search");
       if (this.readyState === 4) {
         if (this.status !== 200) {
-          update_func(item, { callNumber: "" });
+          update_func(item, { ccfInfo: "" });
           return;
         }
         const resp = JSON.parse(this.responseText).result.hits;
         if (resp["@sent"] === 0) {
-          update_func(item, { callNumber: "dblp not found" });
+          update_func(item, { ccfInfo: "dblp not found" });
           return;
         }
         let dblp_url = "";
@@ -4694,7 +4694,7 @@ export const PaperInfo: PaperInfo = {
         if (EditDis > 0) {
           abbr = `${abbr}?ED:${EditDis}`;
         }
-        update_func(item, { callNumber: `CCF-${rank} ${abbr}` });
+        update_func(item, { ccfInfo: `CCF-${rank} ${abbr}` });
         console.log(`CCF-${rank} ${abbr}`);
       }
     };
