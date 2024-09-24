@@ -12,7 +12,7 @@ export class UIExampleFactory {
         dataProvider: (item: Zotero.Item, dataKey: string) => {
           const tags = item.getTags() as { tag: string; type: number }[];
           const ccfInfo = tags.find((tag) => tag.tag.startsWith("ccfInfo: "));
-          return ccfInfo ? ccfInfo.tag.split(": ")[1] : "null";
+          return ccfInfo ? ccfInfo.tag.split(": ")[1] : "";
         },
       },
       {
@@ -24,7 +24,7 @@ export class UIExampleFactory {
           const citationNumber = tags.find((tag) =>
             tag.tag.startsWith("citationNumber: "),
           );
-          return citationNumber ? citationNumber.tag.split(": ")[1] : "null";
+          return citationNumber ? citationNumber.tag.split(": ")[1] : "";
         },
       },
     ]);
@@ -42,6 +42,17 @@ export class UIExampleFactory {
         if (item && item.length > 0) {
           item.forEach(async (entry) => {
             try {
+              // 清除该条目所有ccf信息
+              entry.getTags().forEach((tag) => {
+                if (tag.tag.startsWith("ccfInfo:")) {
+                  entry.removeTag(tag.tag);
+                }
+                if (tag.tag.startsWith("citationNumber:")) {
+                  entry.removeTag(tag.tag);
+                }
+              });
+              entry.saveTx();
+
               const citationNumber = PaperInfo.getPaperCitationNumber(
                 entry,
                 entry.getField("title"),
@@ -58,8 +69,8 @@ export class UIExampleFactory {
                   entry.saveTx();
                 },
               );
-              ztoolkit.log(ccfInfo);
-              ztoolkit.log(citationNumber);
+              // ztoolkit.log(ccfInfo);
+              // ztoolkit.log(citationNumber);
 
               // new ztoolkit.ProgressWindow(config.addonName)
               //   .createLine({

@@ -4,4 +4,13 @@
 
 This is a plugin for easily obtaining the ccf rating of a paper, the corresponding conference/journal and the number of citations in [Zotero](https://www.zotero.org/).
 
-![image](https://github.com/user-attachments/assets/cd9564ee-c67a-40e2-a57b-ee36483f2a6b)
+# Usage
+
+You can obtain the CCF information of the corresponding paper by selecting one or more entries and clicking "Get CCF Info" in the right-click menu.
+
+![image](https://github.com/user-attachments/assets/5a2b939b-1a20-4b93-ba36-5170124be886)
+
+# Contributors
+
+- [TimeTrapzz](https://github.com/TimeTrapzz): Zotero 7 Plugin Rewrite and Adaptation
+- [tojunfeng](https://github.com/tojunfeng): Plugin Core Logic Implementation
