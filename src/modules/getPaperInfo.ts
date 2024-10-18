@@ -1,5 +1,11 @@
+//test
+// const { XMLHttpRequest } = require('xmlhttprequest');
+//test
+
+
 interface PaperInfo {
   strip(s: string): string;
+  cleanString(s: string): string;
   minDistance(s1: string, s2: string): number;
   getPaperCitationNumber(
     item: any,
@@ -4525,6 +4531,11 @@ export const PaperInfo: PaperInfo = {
     return result;
   },
 
+  cleanString(input: string): string {
+    let alphanumeric = input.replace(/[^a-zA-Z0-9]/g, '');
+    return alphanumeric.toLowerCase();
+  },
+
   minDistance(s1: string, s2: string): number {
     const str1 = this.strip(s1);
     const str2 = this.strip(s2);
@@ -4638,62 +4649,50 @@ export const PaperInfo: PaperInfo = {
     title: string,
     update_func: (item: any, data: any) => void,
   ): void {
+
+    title = this.cleanString(title);
+    console.log(title);
+    update_func(item, { ccfInfo: "Searching..." });
+
     const xhr = new XMLHttpRequest();
-    const api_format = `https://dblp.org/search/publ/api?q=${encodeURIComponent(title)}&format=json&h=1000`;
-
+    const api_format = `https://dblp.timetrap.workers.dev/?query=${encodeURIComponent(title)}`;
     xhr.open("GET", api_format, true);
-
     xhr.onreadystatechange = function (this: XMLHttpRequest) {
-      console.log("dblp search");
       if (this.readyState === 4) {
         if (this.status !== 200) {
-          update_func(item, { ccfInfo: "" });
+          update_func(item, { ccfInfo: `Net Error: ${this.status}` });
           return;
         }
-        const resp = JSON.parse(this.responseText).result.hits;
-        if (resp["@sent"] === 0) {
-          update_func(item, { ccfInfo: "dblp not found" });
-          return;
-        }
-        let dblp_url = "";
-        let xhr_venue = "";
-        let EditDis = 100000;
-        for (let h = 0; h < resp["@sent"]; h++) {
-          const info = resp.hit[h].info;
-          const xhr_type = info.type;
-          const url = info.url;
-          const searched_title = info.title;
+        const resp = JSON.parse(this.responseText);
+        let rankinfo = undefined;
+        let ccfnoneinfo = undefined;
 
-          const temp_dis = PaperInfo.minDistance(title, searched_title);
-          if (temp_dis <= EditDis) {
-            if (
-              (xhr_type === "Informal Publications" ||
-                xhr_type === "Informal and Other Publications") &&
-              temp_dis === EditDis
-            ) {
-              continue;
+        for (let i = 0; i < resp['urls'].length; i++) {
+          if (resp['urls'][i]['title'] === title) {
+            let url = resp['urls'][i]['url'];
+            let temp_dblp_url = '/' + url.substring(0, url.lastIndexOf("/"));
+            rankinfo = ccfRankList[temp_dblp_url];
+            if (rankinfo !== undefined) {
+              break;
             }
-            EditDis = temp_dis;
-
-            xhr_venue = info.venue || "";
-            const temp_dblp_url = url.substring(
-              url.indexOf("/rec/") + 4,
-              url.lastIndexOf("/"),
-            );
-            dblp_url = temp_dblp_url;
+            else {
+              let temp = temp_dblp_url.substring(temp_dblp_url.indexOf("/", 1) + 1).toUpperCase();
+              if (ccfnoneinfo === undefined || temp !== "CORR") {
+                ccfnoneinfo = temp;
+              }
+            }
           }
         }
-        const rankinfo = ccfRankList[dblp_url];
-        let rank = "None";
-        let abbr = xhr_venue;
-        if (rankinfo !== undefined) {
-          rank = rankinfo["rank"];
-          abbr = rankinfo["abbr"];
+        if (rankinfo === undefined && ccfnoneinfo === undefined) {
+          update_func(item, { ccfInfo: "Not Found" });
+          return;
         }
-
-        if (EditDis > 0) {
-          abbr = `${abbr}?ED:${EditDis}`;
+        else if (rankinfo === undefined) {
+          update_func(item, { ccfInfo: `CCF-None ${ccfnoneinfo}` });
+          return;
         }
+        const rank = rankinfo["rank"];
+        const abbr = rankinfo["abbr"];
         update_func(item, { ccfInfo: `CCF-${rank} ${abbr}` });
         console.log(`CCF-${rank} ${abbr}`);
       }
@@ -4706,7 +4705,13 @@ export const PaperInfo: PaperInfo = {
     title: string,
     callback: (item: any, data: any) => void,
   ): void {
-    this.getPaperCitationNumber(item, title, callback);
+    // this.getPaperCitationNumber(item, title, callback); TODO: fix this
     this.getPaperCCFRank(item, title, callback);
   },
 };
+
+//test
+// function callback(item: any, data: any) {
+//   console.log(data);
+// }
+// PaperInfo.updatePaperInfo({}, "Large Language Models for Recommendation: Progresses and Future Directions", callback);
