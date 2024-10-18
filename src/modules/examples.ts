@@ -38,10 +38,39 @@ export class UIExampleFactory {
       id: "zotero-itemmenu-get-ccf-info",
       label: getString("get-ccf-info"),
       commandListener: (ev) => {
-        const item = ZoteroPane.getSelectedItems();
-        if (item && item.length > 0) {
-          item.forEach(async (entry) => {
-            try {
+        const items = ZoteroPane.getSelectedItems();
+        if (items && items.length > 0) {
+          if (items.length === 1) {
+            const entry = items[0];
+            entry.getTags().forEach((tag) => {
+              if (tag.tag.startsWith("ccfInfo:")) {
+                entry.removeTag(tag.tag);
+              }
+              if (tag.tag.startsWith("citationNumber:")) {
+                entry.removeTag(tag.tag);
+              }
+            });
+            entry.saveTx();
+
+            PaperInfo.getPaperCCFRank(
+              entry,
+              entry.getField("title"),
+              (item, data) => {
+                entry.addTag(`ccfInfo: ${data.ccfInfo}`);
+                entry.saveTx();
+              },
+            );
+            PaperInfo.getPaperCitationNumber(
+              entry,
+              entry.getField("title"),
+              (item, data) => {
+                entry.addTag(`citationNumber: ${data.citationNumber}`);
+                entry.saveTx();
+              },
+            );
+          }
+          else {
+            items.forEach(async (entry) => {
               // 清除该条目所有ccf信息
               entry.getTags().forEach((tag) => {
                 if (tag.tag.startsWith("ccfInfo:")) {
@@ -52,44 +81,43 @@ export class UIExampleFactory {
                 }
               });
               entry.saveTx();
-
-              const citationNumber = PaperInfo.getPaperCitationNumber(
-                entry,
-                entry.getField("title"),
-                (item, data) => {
-                  entry.addTag(`citationNumber: ${data.citationNumber}`);
-                  entry.saveTx();
-                },
-              );
-              const ccfInfo = PaperInfo.getPaperCCFRank(
-                entry,
-                entry.getField("title"),
-                (item, data) => {
-                  entry.addTag(`ccfInfo: ${data.ccfInfo}`);
-                  entry.saveTx();
-                },
-              );
-              // ztoolkit.log(ccfInfo);
-              // ztoolkit.log(citationNumber);
-
-              // new ztoolkit.ProgressWindow(config.addonName)
-              //   .createLine({
-              //     text: `已更新"${entry.getField("title")}"的ccf信息`,
-              //     type: "success",
-              //     progress: 100,
-              //   })
-              //   .show();
-            } catch (error: unknown) {
-              console.error(`获取ccf信息时出错：${(error as Error).message}`);
-              new ztoolkit.ProgressWindow(config.addonName)
-                .createLine({
-                  text: `更新"${entry.getField("title")}"的ccf信息失败`,
-                  type: "error",
-                  progress: 100,
-                })
-                .show();
-            }
-          });
+            });
+            const titles = items.map((item) => item.getField("title"));
+            PaperInfo.batchGetPaperCCFRank(
+              items,
+              titles,
+              (items, data) => {
+                if (data.length === items.length) {
+                  items.forEach((entry: Zotero.Item, index: number) => {
+                    entry.addTag(`ccfInfo: ${data[index].ccfInfo}`);
+                    entry.saveTx();
+                    PaperInfo.getPaperCitationNumber(
+                      entry,
+                      entry.getField("title"),
+                      (item, data) => {
+                        entry.addTag(`citationNumber: ${data.citationNumber}`);
+                        entry.saveTx();
+                      },
+                    );
+                  });
+                }
+                else {
+                  items.forEach((entry: Zotero.Item) => {
+                    entry.addTag(`ccfInfo: ${data.ccfInfo}`);
+                    entry.saveTx();
+                    PaperInfo.getPaperCitationNumber(
+                      entry,
+                      entry.getField("title"),
+                      (item, data) => {
+                        entry.addTag(`citationNumber: ${data.citationNumber}`);
+                        entry.saveTx();
+                      },
+                    );
+                  });
+                }
+              },
+            );
+          }
         }
       },
       icon: menuIcon,

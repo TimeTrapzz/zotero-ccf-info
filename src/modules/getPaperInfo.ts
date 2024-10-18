@@ -17,6 +17,11 @@ interface PaperInfo {
     title: string,
     update_func: (item: any, data: any) => void,
   ): void;
+  batchGetPaperCCFRank(
+    items: any[],
+    titles: string[],
+    callback: (item: any, data: any) => void,
+  ): void;
   updatePaperInfo(
     item: any,
     title: string,
@@ -4591,10 +4596,11 @@ export const PaperInfo: PaperInfo = {
     xhr.addEventListener("readystatechange", function (this: XMLHttpRequest) {
       if (this.readyState === this.DONE) {
         if (this.status !== 200) {
-          update_func(item, { ccfInfo: `Error: ${this.status}` });
+          update_func(item, { citationNumber: `Error: ${this.status}` });
           return;
         }
         const responseData = JSON.parse(this.responseText).data;
+
         let hit_index = -1;
         let min_dis = 100000;
         for (let i = 0; i < responseData.hitsTotal; i++) {
@@ -4607,9 +4613,9 @@ export const PaperInfo: PaperInfo = {
           }
         }
         if (hit_index === -1) {
-          update_func(item, { ccfInfo: "Not Found" });
+          update_func(item, { citationNumber: "Not Found" });
         } else {
-          const pcitations = responseData.hitList[hit_index].ncitation;
+          const pcitations = responseData.hitList[hit_index].ncitation ? responseData.hitList[hit_index].ncitation : 0;
           const addition_info = min_dis > 0 ? `?ED:${min_dis}` : "";
 
           update_func(item, { citationNumber: pcitations });
@@ -4651,8 +4657,10 @@ export const PaperInfo: PaperInfo = {
   ): void {
 
     title = this.cleanString(title);
-    console.log(title);
-    update_func(item, { ccfInfo: "Searching..." });
+    if (title === "") {
+      update_func(item, { ccfInfo: "Not Found" });
+      return;
+    }
 
     const xhr = new XMLHttpRequest();
     const api_format = `https://dblp.timetrap.workers.dev/?query=${encodeURIComponent(title)}`;
@@ -4694,10 +4702,75 @@ export const PaperInfo: PaperInfo = {
         const rank = rankinfo["rank"];
         const abbr = rankinfo["abbr"];
         update_func(item, { ccfInfo: `CCF-${rank} ${abbr}` });
-        console.log(`CCF-${rank} ${abbr}`);
+        // console.log(`CCF-${rank} ${abbr}`);
       }
     };
     xhr.send();
+  },
+
+  batchGetPaperCCFRank(
+    items: any[],
+    titles: string[],
+    update_func: (items: any[], data: any) => void,
+  ): void {
+    titles = titles.map(title => this.cleanString(title));
+
+    const xhr = new XMLHttpRequest();
+    const api_format = `https://dblp.timetrap.workers.dev/`;
+    const data = JSON.stringify({
+      queries: titles,
+    });
+    ztoolkit.log(data);
+    xhr.open("POST", api_format, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function (this: XMLHttpRequest) {
+      if (this.readyState === 4) {
+        if (this.status !== 200) {
+          update_func(items, { ccfInfo: `Net Error: ${this.status}` });
+          return;
+        }
+
+        const resp = JSON.parse(this.responseText);
+        const results: any[] = [];
+
+        items.forEach((item, index) => {
+          const title = titles[index];
+          let rankinfo = undefined;
+          let ccfnoneinfo = undefined;
+
+          for (let i = 0; i < resp[index]['urls'].length; i++) {
+            if (resp[index]['urls'][i]['title'] === title) {
+              let url = resp[index]['urls'][i]['url'];
+              let temp_dblp_url = '/' + url.substring(0, url.lastIndexOf("/"));
+              rankinfo = ccfRankList[temp_dblp_url];
+              if (rankinfo !== undefined) {
+                break;
+              }
+              else {
+                let temp = temp_dblp_url.substring(temp_dblp_url.indexOf("/", 1) + 1).toUpperCase();
+                if (ccfnoneinfo === undefined || temp !== "CORR") {
+                  ccfnoneinfo = temp;
+                }
+              }
+            }
+          }
+
+          if (rankinfo === undefined && ccfnoneinfo === undefined) {
+            results.push({ ccfInfo: "Not Found" });
+          }
+          else if (rankinfo === undefined) {
+            results.push({ ccfInfo: `CCF-None ${ccfnoneinfo}` });
+          }
+          else {
+            const rank = rankinfo["rank"];
+            const abbr = rankinfo["abbr"];
+            results.push({ ccfInfo: `CCF-${rank} ${abbr}` });
+          }
+        });
+        update_func(items, results);
+      }
+    };
+    xhr.send(data);
   },
 
   updatePaperInfo(
