@@ -17,6 +17,7 @@ export class UIExampleFactory {
             const ccfInfo = tags.find((tag) => tag.tag.startsWith("ccfInfo: "));
             return ccfInfo ? ccfInfo.tag.split(": ")[1] : "";
           }
+          return "";
         },
       },
       {
@@ -29,6 +30,7 @@ export class UIExampleFactory {
             const citationNumber = tags.find((tag) => tag.tag.startsWith("citationNumber: "));
             return citationNumber ? citationNumber.tag.split(": ")[1] : "";
           }
+          return "";
         },
       },
     ]);
