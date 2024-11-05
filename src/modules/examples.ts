@@ -2,6 +2,8 @@ import { config } from "../../package.json";
 import { getLocaleID, getString } from "../utils/locale";
 import { PaperInfo } from "./getPaperInfo";
 
+
+
 export class UIExampleFactory {
   static async registerExtraColumn() {
     await Zotero.ItemTreeManager.registerColumns([
@@ -10,9 +12,11 @@ export class UIExampleFactory {
         dataKey: "ccfInfo",
         label: getString("ccf-info"),
         dataProvider: (item: Zotero.Item, dataKey: string) => {
-          const tags = item.getTags() as { tag: string; type: number }[];
-          const ccfInfo = tags.find((tag) => tag.tag.startsWith("ccfInfo: "));
-          return ccfInfo ? ccfInfo.tag.split(": ")[1] : "";
+          if (item.itemTypeID > 0) {
+            const tags = item.getTags() as { tag: string; type: number }[];
+            const ccfInfo = tags.find((tag) => tag.tag.startsWith("ccfInfo: "));
+            return ccfInfo ? ccfInfo.tag.split(": ")[1] : "";
+          }
         },
       },
       {
@@ -20,11 +24,11 @@ export class UIExampleFactory {
         dataKey: "citationNumber",
         label: getString("citation-number"),
         dataProvider: (item: Zotero.Item, dataKey: string) => {
-          const tags = item.getTags() as { tag: string; type: number }[];
-          const citationNumber = tags.find((tag) =>
-            tag.tag.startsWith("citationNumber: "),
-          );
-          return citationNumber ? citationNumber.tag.split(": ")[1] : "";
+          if (item.itemTypeID > 0) {
+            const tags = item.getTags() as { tag: string; type: number }[];
+            const citationNumber = tags.find((tag) => tag.tag.startsWith("citationNumber: "));
+            return citationNumber ? citationNumber.tag.split(": ")[1] : "";
+          }
         },
       },
     ]);
