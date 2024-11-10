@@ -1,4 +1,4 @@
-import { UIExampleFactory } from "./modules/examples";
+import { ExampleFactory } from "./modules/examples";
 import { config } from "../package.json";
 import { getString, initLocale } from "./utils/locale";
 import { createZToolkit } from "./utils/ztoolkit";
@@ -15,9 +15,9 @@ async function onStartup() {
   await onMainWindowLoad(window);
 
   // Register all UI components and listeners
-  UIExampleFactory.registerRightClickMenuItem();
-  UIExampleFactory.registerExtraColumn();
-  UIExampleFactory.registerNotifier();
+  ExampleFactory.registerRightClickMenuItem();
+  ExampleFactory.registerExtraColumn();
+  ExampleFactory.registerNotifier();
 }
 
 async function onMainWindowLoad(win: Window): Promise<void> {
@@ -28,6 +28,34 @@ async function onMainWindowLoad(win: Window): Promise<void> {
 async function onMainWindowUnload(win: Window): Promise<void> {
   ztoolkit.unregisterAll();
   addon.data.dialog?.window?.close();
+}
+
+async function onNotify(
+  event: string,
+  type: string,
+  ids: Array<string | number>,
+  extraData: { [key: string]: any },
+) {
+  ztoolkit.log("notify", event, type, ids, extraData);
+
+  if (event == "add" && type == "item") {
+    // Get items and filter out attachments and other non-regular items
+    const items = Zotero.Items.get(ids as number[]);
+    const regularItems = items.filter(
+      (item) =>
+        item.isRegularItem() &&
+        !item.isAttachment() &&
+        // @ts-ignore item has no isFeedItem
+        !item.isFeedItem &&
+        // @ts-ignore libraryID is got from item, so get() will never return false
+        Zotero.Libraries.get(item.libraryID)._libraryType == "user",
+    );
+
+    if (regularItems.length !== 0) {
+      ExampleFactory.exampleNotifierCallback(regularItems);
+      return;
+    }
+  }
 }
 
 function onShutdown(): void {
@@ -45,6 +73,7 @@ function onShutdown(): void {
 export default {
   onStartup,
   onShutdown,
+  onNotify,
   onMainWindowLoad,
   onMainWindowUnload,
 };

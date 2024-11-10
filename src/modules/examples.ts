@@ -3,8 +3,7 @@ import { getLocaleID, getString } from "../utils/locale";
 import { PaperInfo } from "./getPaperInfo";
 
 
-
-export class UIExampleFactory {
+export class ExampleFactory {
   static async registerExtraColumn() {
     await Zotero.ItemTreeManager.registerColumns([
       {
@@ -38,17 +37,26 @@ export class UIExampleFactory {
 
   public static async handleGetCCFInfo(items: Zotero.Item[]) {
     if (!items || items.length === 0) return;
-
+    ztoolkit.log("handleGetCCFInfo", items);
     if (items.length === 1) {
-      await UIExampleFactory.handleSingleItem(items[0]);
+      await ExampleFactory.handleSingleItem(items[0]);
     } else {
-      await UIExampleFactory.handleMultipleItems(items);
+      await ExampleFactory.handleMultipleItems(items);
     }
   }
 
   private static async handleSingleItem(entry: Zotero.Item) {
     // Clear existing tags
-    UIExampleFactory.clearCCFTags(entry);
+    ExampleFactory.clearCCFTags(entry);
+    const progressWindow = new ztoolkit.ProgressWindow(getString("paper-info-update"), {
+      closeOtherProgressWindows: true
+    });
+    const progressLine = new progressWindow.ItemProgress(
+      "default",
+      getString("requesting-citation-single")
+    );
+    progressWindow.show();
+    progressWindow.startCloseTimer(2000);
 
     // Get new CCF rank and citation number
     PaperInfo.getPaperCCFRank(
@@ -57,14 +65,24 @@ export class UIExampleFactory {
       (item, data) => {
         entry.addTag(`ccfInfo: ${data.ccfInfo}`);
         entry.saveTx();
-        UIExampleFactory.updateCitationNumber(entry, 1);
+        ExampleFactory.updateCitationNumber(entry, 1);
       },
     );
   }
 
   private static async handleMultipleItems(items: Zotero.Item[]) {
     // Clear existing tags for all items
-    items.forEach(entry => UIExampleFactory.clearCCFTags(entry));
+    items.forEach(entry => ExampleFactory.clearCCFTags(entry));
+
+    const progressWindow = new ztoolkit.ProgressWindow(getString("paper-info-update"), {
+      closeOtherProgressWindows: true
+    });
+    const progressLine = new progressWindow.ItemProgress(
+      "default",
+      getString("requesting-citations-multiple", { args: { count: items.length } })
+    );
+    progressWindow.show();
+    progressWindow.startCloseTimer(2000);
 
     const titles = items.map(item => item.getField("title"));
     PaperInfo.batchGetPaperCCFRank(
@@ -75,13 +93,13 @@ export class UIExampleFactory {
           items.forEach((entry: Zotero.Item, index: number) => {
             entry.addTag(`ccfInfo: ${data[index].ccfInfo}`);
             entry.saveTx();
-            UIExampleFactory.updateCitationNumber(entry, index, items.length);
+            ExampleFactory.updateCitationNumber(entry, index, items.length);
           });
         } else {
           items.forEach((entry: Zotero.Item, index: number) => {
             entry.addTag(`ccfInfo: ${data.ccfInfo}`);
             entry.saveTx();
-            UIExampleFactory.updateCitationNumber(entry, items.length, index);
+            ExampleFactory.updateCitationNumber(entry, items.length, index);
           });
         }
       },
@@ -98,25 +116,12 @@ export class UIExampleFactory {
   }
 
   private static async updateCitationNumber(entry: Zotero.Item, index?: number, total?: number) {
-    // Create progress window for every request
-    const progressWindow = new ztoolkit.ProgressWindow(getString("paper-info-update"), {
-      closeOtherProgressWindows: true
-    });
-    const progressLine = new progressWindow.ItemProgress(
-      "default",
-      total ?
-        getString("requesting-citations-multiple", { args: { count: total } }) :
-        getString("requesting-citation-single")
-    );
-    progressWindow.show();
-
     PaperInfo.getPaperCitationNumber(
       entry,
       entry.getField("title"),
       (item, data) => {
         entry.addTag(`citationNumber: ${data.citationNumber}`);
         entry.saveTx();
-        progressWindow.startCloseTimer(2000);
       },
     );
   }
@@ -129,23 +134,47 @@ export class UIExampleFactory {
       label: getString("get-ccf-info"),
       commandListener: (ev) => {
         const items = ZoteroPane.getSelectedItems();
-        UIExampleFactory.handleGetCCFInfo(items);
+        ExampleFactory.handleGetCCFInfo(items);
       },
       icon: menuIcon,
     });
   }
 
   static registerNotifier() {
-    Zotero.Notifier.registerObserver({
-      notify: async (event: string, type: string, ids: (string | number)[], extraData: object) => {
-        if (event === 'add' && type === 'item') {
-          const items = ids.map(id => Zotero.Items.get(Number(id)))
-            .filter(item => item.isRegularItem());
-          if (items.length > 0) {
-            await UIExampleFactory.handleGetCCFInfo(items);
-          }
+    const callback = {
+      notify: async (
+        event: string,
+        type: string,
+        ids: Array<string | number>,
+        extraData: { [key: string]: any },
+      ) => {
+        if (!addon?.data.alive) {
+          this.unregisterNotifier(notifierID);
+          return;
         }
-      }
-    }, ['item']);
+        addon.hooks.onNotify(event, type, ids, extraData);
+      },
+    };
+
+    const notifierID = Zotero.Notifier.registerObserver(callback, ["item"]);
+
+    // Unregister callback when the window closes (important to avoid a memory leak)
+    window.addEventListener(
+      "unload",
+      (e: Event) => {
+        this.unregisterNotifier(notifierID);
+      },
+      false,
+    );
+  }
+
+  static async exampleNotifierCallback(regularItems: any) {
+    // 等待 10s 以防止 Zotero 未完成条目添加
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    await ExampleFactory.handleGetCCFInfo(regularItems);
+  }
+
+  private static unregisterNotifier(notifierID: string) {
+    Zotero.Notifier.unregisterObserver(notifierID);
   }
 }
