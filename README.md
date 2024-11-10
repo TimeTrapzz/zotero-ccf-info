@@ -10,6 +10,24 @@ You can obtain the CCF information of the corresponding paper by selecting one o
 
 ![image](https://github.com/user-attachments/assets/5a2b939b-1a20-4b93-ba36-5170124be886)
 
+# Add missing journal/conference information
+
+If the journal/conference information is missing, you can refer to `src/modules/getPaperInfo.ts` to add the missing information. The format is as follows:
+
+```json
+{
+  "/conf/icml": {
+    "rank": "A",
+    "abbr": "ICML",
+    "full": "International Conference on Machine Learning",
+    "url": "/conf/icml",
+    "dblp": "/conf/icml/icml"
+  }
+}
+```
+
+Then, you can submit a PR to add the missing information.
+
 # Contributors
 
 - [TimeTrapzz](https://github.com/TimeTrapzz): Zotero 7 Plugin Rewrite and Adaptation
