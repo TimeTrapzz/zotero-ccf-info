@@ -14,9 +14,10 @@ async function onStartup() {
 
   await onMainWindowLoad(window);
 
+  // Register all UI components and listeners
   UIExampleFactory.registerRightClickMenuItem();
-
   UIExampleFactory.registerExtraColumn();
+  UIExampleFactory.registerNotifier();
 }
 
 async function onMainWindowLoad(win: Window): Promise<void> {

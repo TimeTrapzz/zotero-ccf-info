@@ -36,97 +36,116 @@ export class UIExampleFactory {
     ]);
   }
 
+  public static async handleGetCCFInfo(items: Zotero.Item[]) {
+    if (!items || items.length === 0) return;
+
+    if (items.length === 1) {
+      await UIExampleFactory.handleSingleItem(items[0]);
+    } else {
+      await UIExampleFactory.handleMultipleItems(items);
+    }
+  }
+
+  private static async handleSingleItem(entry: Zotero.Item) {
+    // Clear existing tags
+    UIExampleFactory.clearCCFTags(entry);
+
+    // Get new CCF rank and citation number
+    PaperInfo.getPaperCCFRank(
+      entry,
+      entry.getField("title"),
+      (item, data) => {
+        entry.addTag(`ccfInfo: ${data.ccfInfo}`);
+        entry.saveTx();
+        UIExampleFactory.updateCitationNumber(entry, 1);
+      },
+    );
+  }
+
+  private static async handleMultipleItems(items: Zotero.Item[]) {
+    // Clear existing tags for all items
+    items.forEach(entry => UIExampleFactory.clearCCFTags(entry));
+
+    const titles = items.map(item => item.getField("title"));
+    PaperInfo.batchGetPaperCCFRank(
+      items,
+      titles,
+      (items, data) => {
+        if (data.length === items.length) {
+          items.forEach((entry: Zotero.Item, index: number) => {
+            entry.addTag(`ccfInfo: ${data[index].ccfInfo}`);
+            entry.saveTx();
+            UIExampleFactory.updateCitationNumber(entry, index, items.length);
+          });
+        } else {
+          items.forEach((entry: Zotero.Item, index: number) => {
+            entry.addTag(`ccfInfo: ${data.ccfInfo}`);
+            entry.saveTx();
+            UIExampleFactory.updateCitationNumber(entry, items.length, index);
+          });
+        }
+      },
+    );
+  }
+
+  private static clearCCFTags(entry: Zotero.Item) {
+    entry.getTags().forEach(tag => {
+      if (tag.tag.startsWith("ccfInfo:") || tag.tag.startsWith("citationNumber:")) {
+        entry.removeTag(tag.tag);
+      }
+    });
+    entry.saveTx();
+  }
+
+  private static async updateCitationNumber(entry: Zotero.Item, index?: number, total?: number) {
+    // Create progress window for every request
+    const progressWindow = new ztoolkit.ProgressWindow(getString("paper-info-update"), {
+      closeOtherProgressWindows: true
+    });
+    const progressLine = new progressWindow.ItemProgress(
+      "default",
+      total ?
+        getString("requesting-citations-multiple", { args: { count: total } }) :
+        getString("requesting-citation-single")
+    );
+    progressWindow.show();
+
+    PaperInfo.getPaperCitationNumber(
+      entry,
+      entry.getField("title"),
+      (item, data) => {
+        entry.addTag(`citationNumber: ${data.citationNumber}`);
+        entry.saveTx();
+        progressWindow.startCloseTimer(2000);
+      },
+    );
+  }
+
   static registerRightClickMenuItem() {
     const menuIcon = `chrome://${config.addonRef}/content/icons/favicon@0.5x.png`;
-    // item menuitem with icon
     ztoolkit.Menu.register("item", {
       tag: "menuitem",
       id: "zotero-itemmenu-get-ccf-info",
       label: getString("get-ccf-info"),
       commandListener: (ev) => {
         const items = ZoteroPane.getSelectedItems();
-        if (items && items.length > 0) {
-          if (items.length === 1) {
-            const entry = items[0];
-            entry.getTags().forEach((tag) => {
-              if (tag.tag.startsWith("ccfInfo:")) {
-                entry.removeTag(tag.tag);
-              }
-              if (tag.tag.startsWith("citationNumber:")) {
-                entry.removeTag(tag.tag);
-              }
-            });
-            entry.saveTx();
-
-            PaperInfo.getPaperCCFRank(
-              entry,
-              entry.getField("title"),
-              (item, data) => {
-                entry.addTag(`ccfInfo: ${data.ccfInfo}`);
-                entry.saveTx();
-              },
-            );
-            PaperInfo.getPaperCitationNumber(
-              entry,
-              entry.getField("title"),
-              (item, data) => {
-                entry.addTag(`citationNumber: ${data.citationNumber}`);
-                entry.saveTx();
-              },
-            );
-          }
-          else {
-            items.forEach(async (entry) => {
-              // 清除该条目所有ccf信息
-              entry.getTags().forEach((tag) => {
-                if (tag.tag.startsWith("ccfInfo:")) {
-                  entry.removeTag(tag.tag);
-                }
-                if (tag.tag.startsWith("citationNumber:")) {
-                  entry.removeTag(tag.tag);
-                }
-              });
-              entry.saveTx();
-            });
-            const titles = items.map((item) => item.getField("title"));
-            PaperInfo.batchGetPaperCCFRank(
-              items,
-              titles,
-              (items, data) => {
-                if (data.length === items.length) {
-                  items.forEach((entry: Zotero.Item, index: number) => {
-                    entry.addTag(`ccfInfo: ${data[index].ccfInfo}`);
-                    entry.saveTx();
-                    PaperInfo.getPaperCitationNumber(
-                      entry,
-                      entry.getField("title"),
-                      (item, data) => {
-                        entry.addTag(`citationNumber: ${data.citationNumber}`);
-                        entry.saveTx();
-                      },
-                    );
-                  });
-                }
-                else {
-                  items.forEach((entry: Zotero.Item) => {
-                    entry.addTag(`ccfInfo: ${data.ccfInfo}`);
-                    entry.saveTx();
-                    PaperInfo.getPaperCitationNumber(
-                      entry,
-                      entry.getField("title"),
-                      (item, data) => {
-                        entry.addTag(`citationNumber: ${data.citationNumber}`);
-                        entry.saveTx();
-                      },
-                    );
-                  });
-                }
-              },
-            );
-          }
-        }
+        UIExampleFactory.handleGetCCFInfo(items);
       },
       icon: menuIcon,
     });
+  }
+
+  static registerNotifier() {
+    Zotero.Notifier.registerObserver({
+      notify: async (event: string, type: string, ids: (string | number)[], extraData: object) => {
+        if (event === 'add' && type === 'item') {
+          const items = ids.map(id => Zotero.Items.get(Number(id)))
+            .filter(item => item.isRegularItem());
+          if (items.length > 0) {
+            await UIExampleFactory.handleGetCCFInfo(items);
+          }
+        }
+      }
+    }, ['item']);
   }
 }

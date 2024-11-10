@@ -1,3 +1,6 @@
 ccf-info = CCF Info
 get-ccf-info = Get CCF Info
 citation-number = Citation Number
+paper-info-update = CCF Info Update
+requesting-citations-multiple = Requesting CCF info for { $count } items...
+requesting-citation-single = Requesting CCF info...
