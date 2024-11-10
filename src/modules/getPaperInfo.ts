@@ -801,12 +801,19 @@ const ccfRankList: { [key: string]: RankInfo } = {
     url: "/journals/winet",
     dblp: "/journals/winet/winet",
   },
-  "/journals/iot": {
+  "/journals/iotj": {
     rank: "C",
-    abbr: "IOT",
+    abbr: "IOTJ",
     full: "IEEE Internet of Things Journal",
-    url: "/journals/iot",
-    dblp: "/journals/iot/iot",
+    url: "/journals/iotj",
+    dblp: "/journals/iotj/iotj",
+  },
+  "/journals/imwut": {
+    rank: "A",
+    abbr: "IMWUT",
+    full: "Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies",
+    url: "/journals/imwut",
+    dblp: "/journals/imwut/imwut",
   },
   "/conf/sigcomm": {
     rank: "A",
