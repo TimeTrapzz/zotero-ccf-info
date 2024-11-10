@@ -51,10 +51,10 @@ export class ExampleFactory {
     const progressWindow = new ztoolkit.ProgressWindow(getString("paper-info-update"), {
       closeOtherProgressWindows: true
     });
-    const progressLine = new progressWindow.ItemProgress(
-      "default",
-      getString("requesting-citation-single")
-    );
+    progressWindow.createLine({
+      text: getString("requesting-citation-single"),
+      type: "default"
+    });
     progressWindow.show();
     progressWindow.startCloseTimer(2000);
 
@@ -77,10 +77,10 @@ export class ExampleFactory {
     const progressWindow = new ztoolkit.ProgressWindow(getString("paper-info-update"), {
       closeOtherProgressWindows: true
     });
-    const progressLine = new progressWindow.ItemProgress(
-      "default",
-      getString("requesting-citations-multiple", { args: { count: items.length } })
-    );
+    progressWindow.createLine({
+      text: getString("requesting-citations-multiple", { args: { count: items.length } }),
+      type: "default"
+    });
     progressWindow.show();
     progressWindow.startCloseTimer(2000);
 
