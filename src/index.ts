@@ -4,6 +4,7 @@ import { config } from "../package.json";
 
 const basicTool = new BasicTool();
 
+// @ts-ignore
 if (!basicTool.getGlobal("Zotero")[config.addonInstance]) {
   defineGlobal("window");
   defineGlobal("document");
@@ -13,6 +14,7 @@ if (!basicTool.getGlobal("Zotero")[config.addonInstance]) {
   defineGlobal("ztoolkit", () => {
     return _globalThis.addon.data.ztoolkit;
   });
+  // @ts-ignore
   Zotero[config.addonInstance] = addon;
 }
 
