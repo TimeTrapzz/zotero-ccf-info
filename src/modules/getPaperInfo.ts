@@ -4905,6 +4905,119 @@ const notableVenues: NotableVenueInfo[] = [
     paths: ["/conf/apsys"],
     aliases: ["APSys", "ACM SIGOPS Asia-Pacific Workshop on Systems"],
   },
+  {
+    abbr: "EuroSec",
+    full: "European Workshop on Systems Security",
+    paths: ["/conf/eurosec"],
+    aliases: [
+      "EuroSec",
+      "European Workshop on Systems Security",
+      "European Workshop on System Security",
+    ],
+  },
+  {
+    abbr: "HASP",
+    full: "International Workshop on Hardware and Architectural Support for Security and Privacy",
+    paths: ["/conf/hasp"],
+    aliases: [
+      "HASP",
+      "International Workshop on Hardware and Architectural Support for Security and Privacy",
+    ],
+  },
+  {
+    abbr: "HOST",
+    full: "IEEE International Symposium on Hardware Oriented Security and Trust",
+    paths: ["/conf/host"],
+    aliases: [
+      "HOST",
+      "IEEE International Symposium on Hardware Oriented Security and Trust",
+      "IEEE International Symposium on Hardware-Oriented Security and Trust",
+    ],
+  },
+  {
+    abbr: "AsianHOST",
+    full: "Asian Hardware Oriented Security and Trust Symposium",
+    paths: ["/conf/asianhost"],
+    aliases: [
+      "AsianHOST",
+      "AsiaHOST",
+      "Asian Hardware Oriented Security and Trust Symposium",
+      "Asian Hardware-Oriented Security and Trust Symposium",
+    ],
+  },
+  {
+    abbr: "LAMPS",
+    full: "Workshop on Large AI Systems and Models with Privacy and Safety Analysis",
+    paths: ["/conf/lamps"],
+    aliases: [
+      "LAMPS",
+      "Workshop on Large AI Systems and Models with Privacy and Safety Analysis",
+      "Workshop on Large AI Systems and Models with Privacy and Security Analysis",
+    ],
+  },
+  {
+    abbr: "AICAS",
+    full: "IEEE International Conference on Artificial Intelligence Circuits and Systems",
+    paths: ["/conf/aicas"],
+    aliases: [
+      "AICAS",
+      "IEEE International Conference on Artificial Intelligence Circuits and Systems",
+    ],
+  },
+  {
+    abbr: "CNS",
+    full: "IEEE Conference on Communications and Network Security",
+    paths: ["/conf/cns"],
+    aliases: [
+      "CNS",
+      "IEEE Conference on Communications and Network Security",
+    ],
+  },
+  {
+    abbr: "CSUR",
+    full: "ACM Computing Surveys",
+    paths: ["/journals/csur"],
+    aliases: ["CSUR", "ACM Computing Surveys"],
+  },
+  {
+    abbr: "IEEE D&T",
+    full: "IEEE Design & Test",
+    paths: ["/journals/dt"],
+    aliases: ["D&T", "IEEE D&T", "IEEE Design & Test", "IEEE Design and Test"],
+  },
+  {
+    abbr: "TCAS-II",
+    full: "IEEE Transactions on Circuits and Systems II: Express Briefs",
+    paths: ["/journals/tcasII"],
+    aliases: [
+      "TCAS-II",
+      "IEEE Transactions on Circuits and Systems II: Express Briefs",
+    ],
+  },
+  {
+    abbr: "JETCAS",
+    full: "IEEE Journal on Emerging and Selected Topics in Circuits and Systems",
+    paths: ["/journals/esticas"],
+    aliases: [
+      "JETCAS",
+      "IEEE Journal on Emerging and Selected Topics in Circuits and Systems",
+    ],
+  },
+  {
+    abbr: "TCCN",
+    full: "IEEE Transactions on Cognitive Communications and Networking",
+    paths: ["/journals/tccn"],
+    aliases: [
+      "TCCN",
+      "IEEE Transactions on Cognitive Communications and Networking",
+    ],
+  },
+  {
+    abbr: "TMLR",
+    full: "Transactions on Machine Learning Research",
+    paths: ["/journals/tmlr"],
+    aliases: ["TMLR", "Transactions on Machine Learning Research"],
+  },
 ];
 
 function findNotableVenueByPath(path: string): NotableVenueInfo | undefined {
