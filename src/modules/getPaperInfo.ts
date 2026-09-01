@@ -37,6 +37,13 @@ interface RankInfo {
   dblp: string;
 }
 
+export interface NotableVenueInfo {
+  abbr: string;
+  full: string;
+  paths: string[];
+  aliases: string[];
+}
+
 const ccfRankList: { [key: string]: RankInfo } = {
   "/conf/ppopp": {
     rank: "A",
@@ -4779,6 +4786,332 @@ const ccfRankList: { [key: string]: RankInfo } = {
   },
 };
 
+// Curated venues are intentionally separate from the official CCF catalog.
+export const notableVenues: NotableVenueInfo[] = [
+  {
+    abbr: "COLM",
+    full: "Conference on Language Modeling",
+    paths: ["/conf/colm"],
+    aliases: ["COLM", "Conference on Language Modeling"],
+  },
+  {
+    abbr: "MLSys",
+    full: "Conference on Machine Learning and Systems",
+    paths: ["/conf/mlsys"],
+    aliases: ["MLSys", "Conference on Machine Learning and Systems"],
+  },
+  {
+    abbr: "CoRL",
+    full: "Conference on Robot Learning",
+    paths: ["/conf/corl"],
+    aliases: ["CoRL", "Conference on Robot Learning"],
+  },
+  {
+    abbr: "FAccT",
+    full: "ACM Conference on Fairness, Accountability, and Transparency",
+    paths: ["/conf/fat"],
+    aliases: [
+      "FAccT",
+      "ACM Conference on Fairness, Accountability, and Transparency",
+      "ACM Conference on Fairness, Accountability and Transparency",
+    ],
+  },
+  {
+    abbr: "SaTML",
+    full: "IEEE Conference on Secure and Trustworthy Machine Learning",
+    paths: ["/conf/satml"],
+    aliases: [
+      "SaTML",
+      "IEEE Conference on Secure and Trustworthy Machine Learning",
+    ],
+  },
+  {
+    abbr: "MMSys",
+    full: "ACM SIGMM Conference on Multimedia Systems",
+    paths: ["/conf/mmsys"],
+    aliases: [
+      "MMSys",
+      "ACM Multimedia Systems Conference",
+      "ACM SIGMM Conference on Multimedia Systems",
+    ],
+  },
+  {
+    abbr: "EACL",
+    full: "Conference of the European Chapter of the Association for Computational Linguistics",
+    paths: ["/conf/eacl"],
+    aliases: [
+      "EACL",
+      "Conference of the European Chapter of the Association for Computational Linguistics",
+    ],
+  },
+  {
+    abbr: "WACV",
+    full: "IEEE/CVF Winter Conference on Applications of Computer Vision",
+    paths: ["/conf/wacv"],
+    aliases: [
+      "WACV",
+      "IEEE/CVF Winter Conference on Applications of Computer Vision",
+      "IEEE Winter Conference on Applications of Computer Vision",
+    ],
+  },
+  {
+    abbr: "SIGCSE",
+    full: "ACM Technical Symposium on Computer Science Education",
+    paths: ["/conf/sigcse"],
+    aliases: [
+      "SIGCSE",
+      "ACM Technical Symposium on Computer Science Education",
+      "Technical Symposium on Computer Science Education",
+    ],
+  },
+  {
+    abbr: "AACL/IJCNLP",
+    full: "Asia-Pacific Chapter of the Association for Computational Linguistics and International Joint Conference on Natural Language Processing",
+    paths: ["/conf/ijcnlp"],
+    aliases: [
+      "AACL/IJCNLP",
+      "AACL-IJCNLP",
+      "IJCNLP-AACL",
+      "International Joint Conference on Natural Language Processing",
+    ],
+  },
+  {
+    abbr: "EUVIP",
+    full: "European Workshop on Visual Information Processing",
+    paths: ["/conf/euvip"],
+    aliases: ["EUVIP", "European Workshop on Visual Information Processing"],
+  },
+  {
+    abbr: "RSS",
+    full: "Robotics: Science and Systems",
+    paths: ["/conf/rss"],
+    aliases: ["RSS", "Robotics: Science and Systems"],
+  },
+  {
+    abbr: "ISIT",
+    full: "IEEE International Symposium on Information Theory",
+    paths: ["/conf/isit"],
+    aliases: ["ISIT", "IEEE International Symposium on Information Theory"],
+  },
+  {
+    abbr: "SIGGRAPH Asia",
+    full: "ACM SIGGRAPH Conference and Exhibition on Computer Graphics and Interactive Techniques in Asia",
+    paths: ["/conf/siggrapha"],
+    aliases: ["SIGGRAPH Asia"],
+  },
+  {
+    abbr: "APSys",
+    full: "ACM SIGOPS Asia-Pacific Workshop on Systems",
+    paths: ["/conf/apsys"],
+    aliases: ["APSys", "ACM SIGOPS Asia-Pacific Workshop on Systems"],
+  },
+  {
+    abbr: "EuroSec",
+    full: "European Workshop on Systems Security",
+    paths: ["/conf/eurosec"],
+    aliases: [
+      "EuroSec",
+      "European Workshop on Systems Security",
+      "European Workshop on System Security",
+    ],
+  },
+  {
+    abbr: "HASP",
+    full: "International Workshop on Hardware and Architectural Support for Security and Privacy",
+    paths: ["/conf/hasp"],
+    aliases: [
+      "HASP",
+      "International Workshop on Hardware and Architectural Support for Security and Privacy",
+    ],
+  },
+  {
+    abbr: "HOST",
+    full: "IEEE International Symposium on Hardware Oriented Security and Trust",
+    paths: ["/conf/host"],
+    aliases: [
+      "HOST",
+      "IEEE International Symposium on Hardware Oriented Security and Trust",
+      "IEEE International Symposium on Hardware-Oriented Security and Trust",
+    ],
+  },
+  {
+    abbr: "AsianHOST",
+    full: "Asian Hardware Oriented Security and Trust Symposium",
+    paths: ["/conf/asianhost"],
+    aliases: [
+      "AsianHOST",
+      "AsiaHOST",
+      "Asian Hardware Oriented Security and Trust Symposium",
+      "Asian Hardware-Oriented Security and Trust Symposium",
+    ],
+  },
+  {
+    abbr: "LAMPS",
+    full: "Workshop on Large AI Systems and Models with Privacy and Safety Analysis",
+    paths: ["/conf/lamps"],
+    aliases: [
+      "LAMPS",
+      "Workshop on Large AI Systems and Models with Privacy and Safety Analysis",
+      "Workshop on Large AI Systems and Models with Privacy and Security Analysis",
+    ],
+  },
+  {
+    abbr: "AICAS",
+    full: "IEEE International Conference on Artificial Intelligence Circuits and Systems",
+    paths: ["/conf/aicas"],
+    aliases: [
+      "AICAS",
+      "IEEE International Conference on Artificial Intelligence Circuits and Systems",
+    ],
+  },
+  {
+    abbr: "CNS",
+    full: "IEEE Conference on Communications and Network Security",
+    paths: ["/conf/cns"],
+    aliases: [
+      "CNS",
+      "IEEE Conference on Communications and Network Security",
+    ],
+  },
+  {
+    abbr: "CSUR",
+    full: "ACM Computing Surveys",
+    paths: ["/journals/csur"],
+    aliases: ["CSUR", "ACM Computing Surveys"],
+  },
+  {
+    abbr: "IEEE D&T",
+    full: "IEEE Design & Test",
+    paths: ["/journals/dt"],
+    aliases: ["D&T", "IEEE D&T", "IEEE Design & Test", "IEEE Design and Test"],
+  },
+  {
+    abbr: "TCAS-II",
+    full: "IEEE Transactions on Circuits and Systems II: Express Briefs",
+    paths: ["/journals/tcasII"],
+    aliases: [
+      "TCAS-II",
+      "IEEE Transactions on Circuits and Systems II: Express Briefs",
+    ],
+  },
+  {
+    abbr: "JETCAS",
+    full: "IEEE Journal on Emerging and Selected Topics in Circuits and Systems",
+    paths: ["/journals/esticas"],
+    aliases: [
+      "JETCAS",
+      "IEEE Journal on Emerging and Selected Topics in Circuits and Systems",
+    ],
+  },
+  {
+    abbr: "TCCN",
+    full: "IEEE Transactions on Cognitive Communications and Networking",
+    paths: ["/journals/tccn"],
+    aliases: [
+      "TCCN",
+      "IEEE Transactions on Cognitive Communications and Networking",
+    ],
+  },
+  {
+    abbr: "TMLR",
+    full: "Transactions on Machine Learning Research",
+    paths: ["/journals/tmlr"],
+    aliases: ["TMLR", "Transactions on Machine Learning Research"],
+  },
+];
+
+export function findNotableVenueByPath(
+  path: string,
+): NotableVenueInfo | undefined {
+  return notableVenues.find((venue) => venue.paths.includes(path));
+}
+
+export function normalizeVenueName(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/\b(?:19|20)\d{2}\b/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+export function findNotableVenueFromItem(
+  item: any,
+): NotableVenueInfo | undefined {
+  const fields = ["conferenceName", "proceedingsTitle", "publicationTitle"];
+  const values: string[] = [];
+
+  for (const field of fields) {
+    try {
+      const value = item?.getField?.(field);
+      if (typeof value === "string" && value.trim() !== "") {
+        values.push(normalizeVenueName(value));
+      }
+    } catch (_error) {
+      // Some Zotero item types do not support every venue field.
+    }
+  }
+
+  return notableVenues.find((venue) =>
+    venue.aliases.some((alias) => {
+      const normalizedAlias = normalizeVenueName(alias);
+      return values.some(
+        (value) =>
+          value === normalizedAlias ||
+          (normalizedAlias.length >= 8 && value.includes(normalizedAlias)),
+      );
+    }),
+  );
+}
+
+export function formatNotableVenue(venue: NotableVenueInfo): string {
+  return `CCF-None ${venue.abbr}`;
+}
+
+export function resolveCCFInfo(item: any, title: string, urls: any[]): string {
+  let notableVenue: NotableVenueInfo | undefined;
+  let unrankedVenue: string | undefined;
+
+  for (const result of urls) {
+    if (result?.title !== title || typeof result?.url !== "string") {
+      continue;
+    }
+
+    const url = result.url.replace(/^\/+/, "");
+    const lastSlash = url.lastIndexOf("/");
+    if (lastSlash === -1) {
+      continue;
+    }
+
+    const venuePath = `/${url.substring(0, lastSlash)}`;
+    const rankInfo = ccfRankList[venuePath];
+    if (rankInfo !== undefined) {
+      return `CCF-${rankInfo.rank} ${rankInfo.abbr}`;
+    }
+
+    notableVenue ??= findNotableVenueByPath(venuePath);
+
+    const venueKey = venuePath.split("/")[2]?.toUpperCase();
+    if (venueKey && (unrankedVenue === undefined || venueKey !== "CORR")) {
+      unrankedVenue = venueKey;
+    }
+  }
+
+  notableVenue ??= findNotableVenueFromItem(item);
+  if (notableVenue !== undefined) {
+    return formatNotableVenue(notableVenue);
+  }
+  if (unrankedVenue !== undefined) {
+    return `CCF-None ${unrankedVenue}`;
+  }
+  return "Not Found";
+}
+
+export function resolveNetworkError(item: any, status: number): string {
+  const notableVenue = findNotableVenueFromItem(item);
+  return notableVenue === undefined
+    ? `Net Error: ${status}`
+    : formatNotableVenue(notableVenue);
+}
+
 export const PaperInfo: PaperInfo = {
   strip(s: string): string {
     let result = s.toLowerCase().replace(/[.,^\s]/g, ""); //全部变成小写并去除所有空格逗号和句号
@@ -4927,41 +5260,14 @@ export const PaperInfo: PaperInfo = {
     xhr.onreadystatechange = function (this: XMLHttpRequest) {
       if (this.readyState === 4) {
         if (this.status !== 200) {
-          update_func(item, { ccfInfo: `Net Error: ${this.status}` });
+          update_func(item, {
+            ccfInfo: resolveNetworkError(item, this.status),
+          });
           return;
         }
         const resp = JSON.parse(this.responseText);
-        let rankinfo = undefined;
-        let ccfnoneinfo = undefined;
-
-        for (let i = 0; i < resp['urls'].length; i++) {
-          if (resp['urls'][i]['title'] === title) {
-            let url = resp['urls'][i]['url'];
-            let temp_dblp_url = '/' + url.substring(0, url.lastIndexOf("/"));
-            rankinfo = ccfRankList[temp_dblp_url];
-            if (rankinfo !== undefined) {
-              break;
-            }
-            else {
-              let temp = temp_dblp_url.substring(temp_dblp_url.indexOf("/", 1) + 1).toUpperCase();
-              if (ccfnoneinfo === undefined || temp !== "CORR") {
-                ccfnoneinfo = temp;
-              }
-            }
-          }
-        }
-        if (rankinfo === undefined && ccfnoneinfo === undefined) {
-          update_func(item, { ccfInfo: "Not Found" });
-          return;
-        }
-        else if (rankinfo === undefined) {
-          update_func(item, { ccfInfo: `CCF-None ${ccfnoneinfo}` });
-          return;
-        }
-        const rank = rankinfo["rank"];
-        const abbr = rankinfo["abbr"];
-        update_func(item, { ccfInfo: `CCF-${rank} ${abbr}` });
-        // console.log(`CCF-${rank} ${abbr}`);
+        const urls = Array.isArray(resp?.urls) ? resp.urls : [];
+        update_func(item, { ccfInfo: resolveCCFInfo(item, title, urls) });
       }
     };
     xhr.send();
@@ -4985,47 +5291,23 @@ export const PaperInfo: PaperInfo = {
     xhr.onreadystatechange = function (this: XMLHttpRequest) {
       if (this.readyState === 4) {
         if (this.status !== 200) {
-          update_func(items, { ccfInfo: `Net Error: ${this.status}` });
+          update_func(
+            items,
+            items.map((item) => ({
+              ccfInfo: resolveNetworkError(item, this.status),
+            })),
+          );
           return;
         }
 
         const resp = JSON.parse(this.responseText);
-        const results: any[] = [];
-
-        items.forEach((item, index) => {
-          const title = titles[index];
-          let rankinfo = undefined;
-          let ccfnoneinfo = undefined;
-
-          for (let i = 0; i < resp[index]['urls'].length; i++) {
-            if (resp[index]['urls'][i]['title'] === title) {
-              let url = resp[index]['urls'][i]['url'];
-              let temp_dblp_url = '/' + url.substring(0, url.lastIndexOf("/"));
-              rankinfo = ccfRankList[temp_dblp_url];
-              if (rankinfo !== undefined) {
-                break;
-              }
-              else {
-                let temp = temp_dblp_url.substring(temp_dblp_url.indexOf("/", 1) + 1).toUpperCase();
-                if (ccfnoneinfo === undefined || temp !== "CORR") {
-                  ccfnoneinfo = temp;
-                }
-              }
-            }
-          }
-
-          if (rankinfo === undefined && ccfnoneinfo === undefined) {
-            results.push({ ccfInfo: "Not Found" });
-          }
-          else if (rankinfo === undefined) {
-            results.push({ ccfInfo: `CCF-None ${ccfnoneinfo}` });
-          }
-          else {
-            const rank = rankinfo["rank"];
-            const abbr = rankinfo["abbr"];
-            results.push({ ccfInfo: `CCF-${rank} ${abbr}` });
-          }
-        });
+        const results = items.map((item, index) => ({
+          ccfInfo: resolveCCFInfo(
+            item,
+            titles[index],
+            Array.isArray(resp?.[index]?.urls) ? resp[index].urls : [],
+          ),
+        }));
         update_func(items, results);
       }
     };

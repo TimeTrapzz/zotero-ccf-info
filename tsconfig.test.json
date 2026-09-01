@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "build-test",
+    "rootDir": "."
+  },
+  "include": [
+    "src/modules/getPaperInfo.ts",
+    "tests/**/*.ts",
+    "typings",
+    "node_modules/zotero-types"
+  ],
+  "exclude": ["addon", "build", "build-test"]
+}

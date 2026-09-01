@@ -19,12 +19,13 @@
   },
   "homepage": "https://github.com/TimeTrapzz/zotero-ccf-info#readme",
   "license": "AGPL-3.0-or-later",
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
     "start": "zotero-plugin serve",
     "build": "tsc --noEmit && zotero-plugin build",
     "lint": "prettier --write . && eslint . --fix",
     "release": "zotero-plugin release",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tsc -p tsconfig.test.json && node --test build-test/tests/getPaperInfo.test.js",
     "update-deps": "npm update --save"
   },
   "dependencies": {
