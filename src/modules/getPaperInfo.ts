@@ -37,7 +37,7 @@ interface RankInfo {
   dblp: string;
 }
 
-interface NotableVenueInfo {
+export interface NotableVenueInfo {
   abbr: string;
   full: string;
   paths: string[];
@@ -4787,7 +4787,7 @@ const ccfRankList: { [key: string]: RankInfo } = {
 };
 
 // Curated venues are intentionally separate from the official CCF catalog.
-const notableVenues: NotableVenueInfo[] = [
+export const notableVenues: NotableVenueInfo[] = [
   {
     abbr: "COLM",
     full: "Conference on Language Modeling",
@@ -5020,18 +5020,22 @@ const notableVenues: NotableVenueInfo[] = [
   },
 ];
 
-function findNotableVenueByPath(path: string): NotableVenueInfo | undefined {
+export function findNotableVenueByPath(
+  path: string,
+): NotableVenueInfo | undefined {
   return notableVenues.find((venue) => venue.paths.includes(path));
 }
 
-function normalizeVenueName(value: string): string {
+export function normalizeVenueName(value: string): string {
   return value
     .toLowerCase()
     .replace(/\b(?:19|20)\d{2}\b/g, "")
     .replace(/[^a-z0-9]/g, "");
 }
 
-function findNotableVenueFromItem(item: any): NotableVenueInfo | undefined {
+export function findNotableVenueFromItem(
+  item: any,
+): NotableVenueInfo | undefined {
   const fields = ["conferenceName", "proceedingsTitle", "publicationTitle"];
   const values: string[] = [];
 
@@ -5058,11 +5062,11 @@ function findNotableVenueFromItem(item: any): NotableVenueInfo | undefined {
   );
 }
 
-function formatNotableVenue(venue: NotableVenueInfo): string {
+export function formatNotableVenue(venue: NotableVenueInfo): string {
   return `CCF-None ${venue.abbr}`;
 }
 
-function resolveCCFInfo(item: any, title: string, urls: any[]): string {
+export function resolveCCFInfo(item: any, title: string, urls: any[]): string {
   let notableVenue: NotableVenueInfo | undefined;
   let unrankedVenue: string | undefined;
 
@@ -5101,7 +5105,7 @@ function resolveCCFInfo(item: any, title: string, urls: any[]): string {
   return "Not Found";
 }
 
-function resolveNetworkError(item: any, status: number): string {
+export function resolveNetworkError(item: any, status: number): string {
   const notableVenue = findNotableVenueFromItem(item);
   return notableVenue === undefined
     ? `Net Error: ${status}`
