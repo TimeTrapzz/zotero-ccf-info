@@ -12,7 +12,8 @@ You can obtain the CCF information of the corresponding paper by selecting one o
 
 # Add missing journal/conference information
 
-If the journal/conference information is missing, you can refer to `src/modules/getPaperInfo.ts` to add the missing information. The format is as follows:
+If an officially ranked journal or conference is missing, add it to
+`ccfRankList` in `src/modules/getPaperInfo.ts`. The format is as follows:
 
 ```json
 {
@@ -25,6 +26,10 @@ If the journal/conference information is missing, you can refer to `src/modules/
   }
 }
 ```
+
+Notable venues that are not in the CCF catalog belong in the separate
+`notableVenues` list. They are displayed as `CCF-None <venue>` and must not be
+assigned an unofficial CCF rank.
 
 Then, you can submit a PR to add the missing information.
 
