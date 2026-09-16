@@ -42,7 +42,7 @@ export class ExampleFactory {
             ztoolkit.log("Parsed data:", data);
             return {
               ccfInfo: data.ccfInfo || "",
-              citationNumber: data.citationNumber || "",
+              citationNumber: data.citationNumber ?? "",
             };
           }
         }
@@ -174,7 +174,7 @@ export class ExampleFactory {
             }
 
             const data = ExampleFactory.getCCFInfoFromNote(item);
-            const result = data.citationNumber || "";
+            const result = data.citationNumber ?? "";
             return result;
           } catch (error) {
             ztoolkit.log("Error in citationNumber dataProvider:", error);

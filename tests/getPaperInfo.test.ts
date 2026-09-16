@@ -2,6 +2,7 @@ import { deepEqual, equal } from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  PaperInfo,
   findNotableVenueByPath,
   normalizeVenueName,
   notableVenues,
@@ -131,4 +132,82 @@ describe("network fallback", () => {
   it("preserves the HTTP status when no fallback is available", () => {
     equal(resolveNetworkError(makeItem(), 503), "Net Error: 503");
   });
+});
+
+describe("citation lookup", () => {
+  for (const citationNumber of [131, 0]) {
+    it(`retrieves ${citationNumber} citations with privileged XHR`, (t) => {
+      const title = "Example paper";
+      const item = makeItem({ title });
+      let requested = false;
+      let result: unknown;
+
+      class PrivilegedXHR {
+        DONE = 4;
+        readyState = 0;
+        status = 200;
+        responseText = JSON.stringify({
+          data: {
+            hitsTotal: 1,
+            hitList: [{ title, ncitation: citationNumber }],
+          },
+        });
+        listener?: () => void;
+
+        set withCredentials(_value: boolean) {
+          throw new DOMException(
+            "XMLHttpRequest must not be sending.",
+            "InvalidStateError",
+          );
+        }
+
+        addEventListener(event: string, listener: () => void) {
+          equal(event, "readystatechange");
+          this.listener = listener;
+        }
+
+        open(method: string, url: string) {
+          equal(method, "POST");
+          equal(
+            url,
+            "https://searchtest.aminer.cn/aminer-search/search/publication",
+          );
+          this.readyState = 1;
+        }
+
+        setRequestHeader() {}
+
+        send(body: string) {
+          equal(JSON.parse(body).searchKeyWordList[0].keyword, title);
+          requested = true;
+          this.readyState = this.DONE;
+          this.listener?.call(this);
+        }
+      }
+
+      const original = Object.getOwnPropertyDescriptor(
+        globalThis,
+        "XMLHttpRequest",
+      );
+      t.after(() => {
+        if (original) {
+          Object.defineProperty(globalThis, "XMLHttpRequest", original);
+        } else {
+          Reflect.deleteProperty(globalThis, "XMLHttpRequest");
+        }
+      });
+      Object.defineProperty(globalThis, "XMLHttpRequest", {
+        configurable: true,
+        value: PrivilegedXHR,
+      });
+
+      PaperInfo.getPaperCitationNumber(item, title, (updatedItem, data) => {
+        equal(updatedItem, item);
+        result = data;
+      });
+
+      equal(requested, true);
+      deepEqual(result, { citationNumber });
+    });
+  }
 });
