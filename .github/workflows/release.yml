@@ -2,9 +2,18 @@ name: Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - v**
+    paths:
+      - package.json
+      - .github/workflows/release.yml
   workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -22,30 +31,72 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check release version
+        id: release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { version } = require('./package.json');
+            if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) {
+              throw new Error(`Invalid release version: ${version}`);
+            }
+            const tag = `v${version}`;
+            if (context.ref.startsWith('refs/tags/') && context.ref !== `refs/tags/${tag}`) {
+              throw new Error(`Tag ${context.ref} does not match package version ${tag}`);
+            }
+            core.setOutput('tag', tag);
+            try {
+              await github.rest.repos.getReleaseByTag({ ...context.repo, tag });
+              core.info(`${tag} already has a release; skipping publication.`);
+              core.setOutput('publish', 'false');
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              core.setOutput('publish', 'true');
+            }
+
+      - name: Setup pnpm
+        if: steps.release.outputs.publish == 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
       - name: Setup Node.js
+        if: steps.release.outputs.publish == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 9
-          run_install: false
-          
       - name: Install deps
-        run: pnpm install
+        if: steps.release.outputs.publish == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        if: steps.release.outputs.publish == 'true'
+        run: pnpm test
 
       - name: Build
+        if: steps.release.outputs.publish == 'true'
+        run: pnpm build
+
+      - name: Ensure release tag
+        if: steps.release.outputs.publish == 'true'
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
         run: |
-          pnpm run build
+          if git rev-parse --verify --quiet "refs/tags/$RELEASE_TAG"; then
+            test "$(git rev-list -n 1 "$RELEASE_TAG")" = "$GITHUB_SHA"
+          else
+            git tag "$RELEASE_TAG" "$GITHUB_SHA"
+            git push origin "refs/tags/$RELEASE_TAG"
+          fi
 
       - name: Release to GitHub
-        run: |
-          pnpm run release
-          sleep 1s
+        if: steps.release.outputs.publish == 'true'
+        run: pnpm release
 
       - name: Notify release
+        if: steps.release.outputs.publish == 'true'
         uses: apexskier/github-release-commenter@v1
         continue-on-error: true
         with:
