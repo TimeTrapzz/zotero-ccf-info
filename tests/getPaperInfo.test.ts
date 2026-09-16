@@ -1,5 +1,6 @@
 import { deepEqual, equal } from "node:assert/strict";
 import { describe, it } from "node:test";
+import { ExampleFactory } from "../src/modules/examples";
 
 import {
   findNotableVenueByPath,
@@ -130,5 +131,64 @@ describe("network fallback", () => {
 
   it("preserves the HTTP status when no fallback is available", () => {
     equal(resolveNetworkError(makeItem(), 503), "Net Error: 503");
+  });
+});
+
+describe("context menu", () => {
+  it("updates the current selection without the removed Toolkit Menu API", (t) => {
+    const menuItems: EventTarget[] = [];
+    const popup = {};
+    let selectedItems: unknown[] = [];
+    const globals = {
+      addon: { data: {} },
+      ZoteroPane: { getSelectedItems: () => selectedItems },
+      ztoolkit: {
+        getGlobal: () => ({
+          getElementById: (id: string) =>
+            id === "zotero-itemmenu" ? popup : null,
+        }),
+        UI: {
+          appendElement(
+            options: {
+              listeners: { type: string; listener: EventListener }[];
+              enableElementRecord: boolean;
+            },
+            parent: unknown,
+          ) {
+            equal(parent, popup);
+            // Elements must remain registered for cleanup on plugin shutdown.
+            equal(options.enableElementRecord, true);
+            const element = new EventTarget();
+            for (const { type, listener } of options.listeners) {
+              element.addEventListener(type, listener);
+            }
+            menuItems.push(element);
+            return element;
+          },
+        },
+      },
+    };
+    for (const [name, value] of Object.entries(globals)) {
+      const original = Object.getOwnPropertyDescriptor(globalThis, name);
+      t.after(() => {
+        if (original) Object.defineProperty(globalThis, name, original);
+        else Reflect.deleteProperty(globalThis, name);
+      });
+      Object.defineProperty(globalThis, name, { configurable: true, value });
+    }
+    const update = t.mock.method(
+      ExampleFactory,
+      "handleGetCCFInfo",
+      async () => {},
+    );
+
+    ExampleFactory.registerRightClickMenuItem();
+    equal(menuItems.length, 1);
+    equal(update.mock.callCount(), 0);
+
+    selectedItems = [makeItem({ title: "Newly selected paper" })];
+    menuItems[0].dispatchEvent(new Event("command"));
+    equal(update.mock.callCount(), 1);
+    equal(update.mock.calls[0].arguments[0], selectedItems);
   });
 });
