@@ -5183,7 +5183,8 @@ export const PaperInfo: PaperInfo = {
       ],
     });
     const xhr = new XMLHttpRequest();
-    xhr.withCredentials = true;
+    // This public endpoint needs no credentials. Setting withCredentials throws
+    // InvalidStateError in Zotero's privileged XMLHttpRequest context.
 
     xhr.addEventListener("readystatechange", function (this: XMLHttpRequest) {
       if (this.readyState === this.DONE) {
