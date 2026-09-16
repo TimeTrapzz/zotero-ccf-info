@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       zotero-plugin-toolkit:
-        specifier: 5.1.0-beta.13
-        version: 5.1.0-beta.13
+        specifier: 5.2.0
+        version: 5.2.0
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.2
@@ -1033,8 +1033,8 @@ packages:
     engines: {node: '>=22.8.0'}
     hasBin: true
 
-  zotero-plugin-toolkit@5.1.0-beta.13:
-    resolution: {integrity: sha512-/KxIlxECuugVbO4/qpjWaD98lKxVsh9tZSwN/BuLXRyngXFCzMEkeMWj9lbglgiriPzYPYULCbwr1cZgXwpwLQ==}
+  zotero-plugin-toolkit@5.2.0:
+    resolution: {integrity: sha512-NxEOSitQ5z/p29wUXsfwCYu69JPDm6oTNNJFNQpgEL82c74du/fJNNviPiovO5N6Ajo5piz42mCFDql7tZvdUw==}
     engines: {node: '>=18'}
 
   zotero-types@4.1.0-beta.4:
@@ -1985,7 +1985,7 @@ snapshots:
       - jiti
       - magicast
 
-  zotero-plugin-toolkit@5.1.0-beta.13: {}
+  zotero-plugin-toolkit@5.2.0: {}
 
   zotero-types@4.1.0-beta.4:
     dependencies:

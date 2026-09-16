@@ -262,17 +262,37 @@ export class ExampleFactory {
   }
 
   static registerRightClickMenuItem() {
+    const doc = ztoolkit.getGlobal("document");
+    const menu = doc.getElementById("zotero-itemmenu");
+    if (!menu) return;
+
     const menuIcon = `chrome://${config.addonRef}/content/icons/favicon@0.5x.png`;
-    ztoolkit.Menu.register("item", {
-      tag: "menuitem",
-      id: "zotero-itemmenu-get-ccf-info",
-      label: getString("get-ccf-info"),
-      commandListener: (ev) => {
-        const items = ZoteroPane.getSelectedItems();
-        ExampleFactory.handleGetCCFInfo(items);
+    // Toolkit 5.2 removed Menu. UITool supports the same XUL menu on Zotero 7+
+    // and removes the registered element when the toolkit is unregistered.
+    ztoolkit.UI.appendElement(
+      {
+        tag: "menuitem",
+        namespace: "xul",
+        id: "zotero-itemmenu-get-ccf-info",
+        removeIfExists: true,
+        enableElementRecord: true,
+        attributes: {
+          label: getString("get-ccf-info"),
+          class: "menuitem-iconic",
+          image: menuIcon,
+        },
+        listeners: [
+          {
+            type: "command",
+            listener: () => {
+              const items = ZoteroPane.getSelectedItems();
+              void ExampleFactory.handleGetCCFInfo(items);
+            },
+          },
+        ],
       },
-      icon: menuIcon,
-    });
+      menu,
+    );
   }
 
   static registerNotifier() {
