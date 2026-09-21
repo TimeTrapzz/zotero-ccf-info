@@ -1,3 +1,5 @@
+import { resolveAMinerCitation } from "./citations";
+
 //test
 // const { XMLHttpRequest } = require('xmlhttprequest');
 //test
@@ -5183,6 +5185,7 @@ export const PaperInfo: PaperInfo = {
       ],
     });
     const xhr = new XMLHttpRequest();
+    xhr.timeout = 30000;
     // This public endpoint needs no credentials. Setting withCredentials throws
     // InvalidStateError in Zotero's privileged XMLHttpRequest context.
 
@@ -5192,27 +5195,14 @@ export const PaperInfo: PaperInfo = {
           update_func(item, { citationNumber: `Error: ${this.status}` });
           return;
         }
-        const responseData = JSON.parse(this.responseText).data;
-
-        let hit_index = -1;
-        let min_dis = 100000;
-        for (let i = 0; i < responseData.hitsTotal; i++) {
-          const paper = responseData.hitList[i];
-          const ptitle = paper.title;
-          const dis = PaperInfo.minDistance(title, ptitle);
-          if (dis < min_dis) {
-            min_dis = dis;
-            hit_index = i;
-          }
+        let response: unknown;
+        try {
+          response = JSON.parse(this.responseText);
+        } catch (_error) {
+          update_func(item, { citationNumber: "Error: Invalid AMiner response" });
+          return;
         }
-        if (hit_index === -1) {
-          update_func(item, { citationNumber: "Not Found" });
-        } else {
-          const pcitations = responseData.hitList[hit_index].ncitation ? responseData.hitList[hit_index].ncitation : 0;
-          const addition_info = min_dis > 0 ? `?ED:${min_dis}` : "";
-
-          update_func(item, { citationNumber: pcitations });
-        }
+        update_func(item, resolveAMinerCitation(title, response));
       }
     });
     xhr.open(
