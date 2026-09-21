@@ -1,6 +1,7 @@
 import { config } from "../../package.json";
 import { getLocaleID, getString } from "../utils/locale";
 import { PaperInfo } from "./getPaperInfo";
+import type { CitationMetadata } from "./citations";
 
 // Note标题常量
 const CCF_INFO_NOTE_TITLE = "CCF Info & Citations";
@@ -8,7 +9,8 @@ const CCF_INFO_NOTE_TITLE = "CCF Info & Citations";
 // 数据接口
 interface CCFInfoData {
   ccfInfo: string;
-  citationNumber: string;
+  citationNumber: string | number;
+  citation?: CitationMetadata;
 }
 
 export class ExampleFactory {
@@ -32,7 +34,14 @@ export class ExampleFactory {
           ztoolkit.log("Found CCF note, content:", noteContent);
 
           // 移除HTML标签，提取JSON内容
-          const textContent = noteContent.replace(/<[^>]*>/g, '').trim();
+          const textContent = noteContent
+            .replace(/<[^>]*>/g, "")
+            .replace(/&lt;/g, "<")
+            .replace(/&gt;/g, ">")
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&amp;/g, "&")
+            .trim();
           ztoolkit.log("Text content:", textContent);
 
           // 尝试找到JSON部分
@@ -43,6 +52,7 @@ export class ExampleFactory {
             return {
               ccfInfo: data.ccfInfo || "",
               citationNumber: data.citationNumber ?? "",
+              citation: data.citation,
             };
           }
         }
@@ -54,7 +64,12 @@ export class ExampleFactory {
   }
 
   // 保存CCF信息到note
-  private static async saveCCFInfoToNote(item: Zotero.Item, ccfInfo?: string, citationNumber?: string) {
+  private static async saveCCFInfoToNote(
+    item: Zotero.Item,
+    ccfInfo?: string,
+    citationNumber?: string | number,
+    citation?: CitationMetadata,
+  ) {
     try {
 
       // getNotes()返回的是note ID数组
@@ -94,10 +109,17 @@ export class ExampleFactory {
       const jsonData: CCFInfoData = {
         ccfInfo: finalCcfInfo,
         citationNumber: finalCitationNumber,
+        citation:
+          citationNumber !== undefined && citationNumber !== ""
+            ? citation
+            : existingData.citation,
       };
 
       // 构建note内容（使用HTML格式包装JSON，便于在Zotero中查看）
-      const jsonString = JSON.stringify(jsonData, null, 2);
+      const jsonString = JSON.stringify(jsonData, null, 2)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
       const noteContent = `<div><b>${CCF_INFO_NOTE_TITLE}</b></div><div><br /></div><div><pre>${jsonString}</pre></div>`;
 
       ztoolkit.log("Saving CCF note with data:", jsonData);
@@ -174,7 +196,7 @@ export class ExampleFactory {
             }
 
             const data = ExampleFactory.getCCFInfoFromNote(item);
-            const result = data.citationNumber ?? "";
+            const result = String(data.citationNumber ?? "");
             return result;
           } catch (error) {
             ztoolkit.log("Error in citationNumber dataProvider:", error);
@@ -256,7 +278,9 @@ export class ExampleFactory {
       entry,
       entry.getField("title"),
       async (item, data) => {
-        await ExampleFactory.saveCCFInfoToNote(item, undefined, data.citationNumber);
+        await ExampleFactory.saveCCFInfoToNote(
+          item, undefined, data.citationNumber, data.citation,
+        );
       },
     );
   }
