@@ -59,6 +59,7 @@ async function onNotify(
 }
 
 function onShutdown(): void {
+  ExampleFactory.unregisterNotifier();
   ztoolkit.unregisterAll();
   addon.data.dialog?.window?.close();
   // Remove addon object

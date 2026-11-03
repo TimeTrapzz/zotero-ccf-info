@@ -25,7 +25,7 @@
     "build": "tsc --noEmit && zotero-plugin build",
     "lint": "prettier --write . && eslint . --fix",
     "release": "zotero-plugin release",
-    "test": "tsc -p tsconfig.test.json && node --test build-test/tests/getPaperInfo.test.js",
+    "test": "tsc -p tsconfig.test.json && node --test build-test/tests/*.test.js",
     "update-deps": "npm update --save"
   },
   "dependencies": {

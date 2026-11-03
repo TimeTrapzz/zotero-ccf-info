@@ -5,6 +5,7 @@ import { createZToolkit } from "./utils/ztoolkit";
 class Addon {
   public data: {
     alive: boolean;
+    notifierID?: string;
     // Env type, see build.js
     env: "development" | "production";
     ztoolkit: ZToolkit;

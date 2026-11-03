@@ -296,6 +296,8 @@ export class ExampleFactory {
   }
 
   static registerNotifier() {
+    if (addon.data.notifierID !== undefined) return;
+
     const callback = {
       notify: async (
         event: string,
@@ -313,23 +315,20 @@ export class ExampleFactory {
 
     const notifierID = Zotero.Notifier.registerObserver(callback, ["item"]);
 
-    // Unregister callback when the window closes (important to avoid a memory leak)
-    window.addEventListener(
-      "unload",
-      (e: Event) => {
-        this.unregisterNotifier(notifierID);
-      },
-      false,
-    );
+    // The observer belongs to the plugin, not to the first main window.
+    addon.data.notifierID = notifierID;
   }
 
   static async exampleNotifierCallback(regularItems: any) {
     // 等待 10s 以防止 Zotero 未完成条目添加
     await new Promise(resolve => setTimeout(resolve, 10000));
+    if (!addon?.data.alive) return;
     await ExampleFactory.handleGetCCFInfo(regularItems);
   }
 
-  private static unregisterNotifier(notifierID: string) {
+  static unregisterNotifier(notifierID = addon.data.notifierID) {
+    if (notifierID === undefined) return;
     Zotero.Notifier.unregisterObserver(notifierID);
+    if (addon.data.notifierID === notifierID) delete addon.data.notifierID;
   }
 }
