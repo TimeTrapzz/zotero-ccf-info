@@ -136,12 +136,45 @@ describe("network fallback", () => {
 });
 
 describe("citation lookup", () => {
-  for (const citationNumber of [131, 0]) {
-    it(`retrieves ${citationNumber} citations with privileged XHR`, (t) => {
+  const cases = [
+    {
+      name: "retrieves citations with privileged XHR",
+      citationNumber: 131,
+      hitsTotal: 1,
+      pageSize: 1,
+    },
+    {
+      name: "preserves zero citations",
+      citationNumber: 0,
+      hitsTotal: 1,
+      pageSize: 1,
+    },
+    {
+      name: "searches only the returned page when total hits exceed page size",
+      citationNumber: 31244,
+      hitsTotal: 556,
+      pageSize: 100,
+    },
+    {
+      name: "returns Not Found for an empty page with a nonzero total",
+      citationNumber: "Not Found",
+      hitsTotal: 556,
+      pageSize: 0,
+    },
+    {
+      name: "returns Not Found when no results exist",
+      citationNumber: "Not Found",
+      hitsTotal: 0,
+      pageSize: 0,
+    },
+  ];
+  for (const { name, citationNumber, hitsTotal, pageSize } of cases) {
+    it(name, (t) => {
       const title = "Example paper";
       const item = makeItem({ title });
       let requested = false;
       let result: unknown;
+      let callbackCount = 0;
 
       class PrivilegedXHR {
         DONE = 4;
@@ -149,8 +182,13 @@ describe("citation lookup", () => {
         status = 200;
         responseText = JSON.stringify({
           data: {
-            hitsTotal: 1,
-            hitList: [{ title, ncitation: citationNumber }],
+            hitsTotal,
+            // Put the exact match last so every returned record is considered.
+            hitList: Array.from({ length: pageSize }, (_, index) => ({
+              title:
+                index === pageSize - 1 ? title : `Unrelated paper ${index}`,
+              ncitation: index === pageSize - 1 ? citationNumber : 1,
+            })),
           },
         });
         listener?: () => void;
@@ -204,10 +242,12 @@ describe("citation lookup", () => {
 
       PaperInfo.getPaperCitationNumber(item, title, (updatedItem, data) => {
         equal(updatedItem, item);
+        callbackCount++;
         result = data;
       });
 
       equal(requested, true);
+      equal(callbackCount, 1);
       deepEqual(result, { citationNumber });
     });
   }

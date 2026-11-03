@@ -5196,7 +5196,8 @@ export const PaperInfo: PaperInfo = {
 
         let hit_index = -1;
         let min_dis = 100000;
-        for (let i = 0; i < responseData.hitsTotal; i++) {
+        // hitsTotal includes other pages; only hitList is present in this response.
+        for (let i = 0; i < responseData.hitList.length; i++) {
           const paper = responseData.hitList[i];
           const ptitle = paper.title;
           const dis = PaperInfo.minDistance(title, ptitle);
